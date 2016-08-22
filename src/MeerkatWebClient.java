@@ -1,17 +1,28 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
-import java.net.URL;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import com.biotools.meerkat.Action;
 import com.biotools.meerkat.Card;
@@ -49,34 +60,80 @@ public class MeerkatWebClient implements com.biotools.meerkat.Player {
     }
 
 
-    private boolean isDebugOn () {
-        return prefs.getBooleanPreference ("DEBUG", false);
-    }
-
-
-    private void debugPrintln (String str) {
-        if (isDebugOn ()) {
-            System.out.println ("MeerkatWebClient: " + str);
-        }
-    }
-
-
-    public void holeCards (Card c1, Card c2, int seat) {
+    private void postToServer (String urlPostfix, String data) {
         URL serverUrl;
 
 		try {			
 			HttpURLConnection connection;
-			serverUrl = new URL (serverAddress + "holecards");
+			serverUrl = new URL (serverAddress + urlPostfix);
 			connection = (HttpURLConnection) serverUrl.openConnection ();
 			connection.setRequestMethod ("POST");
+
+			OutputStream stream = connection.getOutputStream();
+			PrintWriter writer = new PrintWriter (stream);
+			writer.write (data);
+			stream.close();
+            
 		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} 
-
+		}   
+    }
+    
+    
+    private static String getStringFromDocument(Document doc) {
+        DOMSource domSource = new DOMSource(doc);
+        StringWriter writer = new StringWriter();
+        StreamResult result = new StreamResult(writer);
+        TransformerFactory tf = TransformerFactory.newInstance();
+        Transformer transformer;
+		try {
+			transformer = tf.newTransformer();
+			transformer.transform(domSource, result);
+		} catch (TransformerConfigurationException e) {
+			e.printStackTrace();
+		} catch (TransformerException e) {
+			e.printStackTrace();
+		}
+        
+        return writer.toString();
+    }
+    
+    private static Document newDocument () {
+		try {
+			DocumentBuilder builder;
+			builder = DocumentBuilderFactory.newInstance ().newDocumentBuilder ();
+	        return builder.newDocument ();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		}
+		return null;
+    }
+    
+    
+    public void holeCards (Card c1, Card c2, int seat) {
+        Document document = newDocument ();
+        
+        Element root = document.createElement("holecards");
+        document.appendChild(root);
+        
+        Element cards = document.createElement("cards");
+        root.appendChild(cards);
+        
+        Element card1 = document.createElement("card");
+        card1.setTextContent(c1.toString());
+        cards.appendChild(card1);
+        
+        Element card2 = document.createElement("card");
+        card1.setTextContent(c2.toString());
+        cards.appendChild(card2);
+        
+        Element playerSeat = document.createElement("seat");
+        playerSeat.setTextContent(String.valueOf(seat));
+        root.appendChild(playerSeat);
+        
+        postToServer ("holecards", getStringFromDocument (document));
     }
 
 
@@ -103,7 +160,9 @@ public class MeerkatWebClient implements com.biotools.meerkat.Player {
 
     public void gameOverEvent () {}
 
-    public void gameStartEvent (GameInfo gameInfonfo) { this.gameInfo = gameInfo; }
+    public void gameStartEvent (GameInfo gameInfo) {
+    	this.gameInfo = gameInfo;
+    }
 
     public void gameStateChanged () {}
 
