@@ -1,4 +1,5 @@
 from flask import Flask
+from flask import request
 
 app = Flask (__name__)
 
@@ -7,9 +8,13 @@ def index ():
     return "MeerkatWebClient test webservice"
 
 
-@app.route ("/holecards")
+@app.route ("/holecards", methods=["GET", "POST"])
 def hole_cards ():
-    return "HoleCards"
+    if request.method == 'POST':
+        print (request.data)
+        return request.data
+    else:
+        return "HoleCards"
 
 
 @app.route ("/getaction")
@@ -41,5 +46,5 @@ def stage_event ():
 def win_event ():
     return "WinEvent"
 
-        
+
 app.run ()

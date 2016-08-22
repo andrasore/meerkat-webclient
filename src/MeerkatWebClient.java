@@ -36,140 +36,141 @@ public class MeerkatWebClient implements com.biotools.meerkat.Player {
 
     private String serverAddress;
 
-    public MeerkatWebClient () {
-        serverAddress = prefs.getPreference ("SERVER_ADDRESS", "http://localhost:9000/");
-    }
 
+    public JPanel getSettingsPanel() {
+        JPanel panel = new JPanel();
 
-    public JPanel getSettingsPanel () {
-        JPanel panel = new JPanel ();
+        panel.add(new JLabel("Bot server address:"));
 
-        panel.add (new JLabel ("Bot server address:"));
+        final JTextField addressTextField = new JTextField(serverAddress);
 
-        final JTextField addressTextField = new JTextField (serverAddress);
-
-        addressTextField.addActionListener (new ActionListener () {
-            public void actionPerformed (ActionEvent e) {
-                prefs.setPreference ("SERVER_ADDRESS", addressTextField.getText ());
+        addressTextField.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                prefs.setPreference("SERVER_ADDRESS", addressTextField.getText());
+                serverAddress = addressTextField.getText();
             }
         });
 
-        panel.add (addressTextField);
+        panel.add(addressTextField);
 
         return panel;
     }
 
 
-    private void postToServer (String urlPostfix, String data) {
+    public void holeCards(Card c1, Card c2, int seat) {
+        Document document = newDocument();
+
+        Element root = document.createElement("holecards");
+        document.appendChild(root);
+
+        Element cards = document.createElement("cards");
+        root.appendChild(cards);
+
+        Element card1 = document.createElement("card");
+        card1.setTextContent(c1.toString());
+        cards.appendChild(card1);
+
+        Element card2 = document.createElement("card");
+        card1.setTextContent(c2.toString());
+        cards.appendChild(card2);
+
+        Element playerSeat = document.createElement("seat");
+        playerSeat.setTextContent(String.valueOf(seat));
+        root.appendChild(playerSeat);
+
+        postToServer(serverAddress + "holecards", getStringFromDocument(document));
+    }
+
+
+    public Action getAction() {
+        return new Action(Action.FOLD, 0, 0);
+    }
+
+
+    public Preferences getPreferences() {
+        return prefs;
+    }
+
+
+    public void init(Preferences playerPrefs) { //this is called by PokerAcademy
+        this.prefs = playerPrefs;
+        serverAddress = prefs.getPreference("SERVER_ADDRESS", "http://localhost:9000/");
+    }
+
+
+    public void actionEvent(int pos, Action act) {
+
+    }
+
+    public void dealHoleCardsEvent() {}
+
+    public void gameOverEvent() {}
+
+    public void gameStartEvent(GameInfo gameInfo) {
+        this.gameInfo = gameInfo;
+    }
+
+    public void gameStateChanged() {}
+
+    public void showdownEvent(int seat, Card c1, Card c2) {}
+
+    public void stageEvent(int stage) {}
+
+    public void winEvent(int pos, double amount, String handName) {}
+
+
+    public static void postToServer(String url, String data) {
         URL serverUrl;
 
-		try {			
-			HttpURLConnection connection;
-			serverUrl = new URL (serverAddress + urlPostfix);
-			connection = (HttpURLConnection) serverUrl.openConnection ();
-			connection.setRequestMethod ("POST");
-
-			OutputStream stream = connection.getOutputStream();
-			PrintWriter writer = new PrintWriter (stream);
-			writer.write (data);
-			stream.close();
+        try {
+            HttpURLConnection connection;
+            serverUrl = new URL(url);
+            connection = (HttpURLConnection) serverUrl.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setDoOutput(true);
             
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		}catch (IOException e) {
-			e.printStackTrace();
-		}   
+            OutputStream stream = connection.getOutputStream();
+            PrintWriter writer = new PrintWriter(stream);
+            writer.write(data);
+            writer.close();
+            
+            connection.getResponseCode();
+        } catch(MalformedURLException e) {
+            e.printStackTrace();
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
     }
-    
-    
-    private static String getStringFromDocument(Document doc) {
+
+
+    public static String getStringFromDocument(Document doc) {
         DOMSource domSource = new DOMSource(doc);
         StringWriter writer = new StringWriter();
         StreamResult result = new StreamResult(writer);
         TransformerFactory tf = TransformerFactory.newInstance();
         Transformer transformer;
-		try {
-			transformer = tf.newTransformer();
-			transformer.transform(domSource, result);
-		} catch (TransformerConfigurationException e) {
-			e.printStackTrace();
-		} catch (TransformerException e) {
-			e.printStackTrace();
-		}
-        
+        try {
+            transformer = tf.newTransformer();
+            transformer.transform(domSource, result);
+        } catch(TransformerConfigurationException e) {
+            e.printStackTrace();
+        } catch(TransformerException e) {
+            e.printStackTrace();
+        }
+
         return writer.toString();
     }
-    
-    private static Document newDocument () {
-		try {
-			DocumentBuilder builder;
-			builder = DocumentBuilderFactory.newInstance ().newDocumentBuilder ();
-	        return builder.newDocument ();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		}
-		return null;
-    }
-    
-    
-    public void holeCards (Card c1, Card c2, int seat) {
-        Document document = newDocument ();
-        
-        Element root = document.createElement("holecards");
-        document.appendChild(root);
-        
-        Element cards = document.createElement("cards");
-        root.appendChild(cards);
-        
-        Element card1 = document.createElement("card");
-        card1.setTextContent(c1.toString());
-        cards.appendChild(card1);
-        
-        Element card2 = document.createElement("card");
-        card1.setTextContent(c2.toString());
-        cards.appendChild(card2);
-        
-        Element playerSeat = document.createElement("seat");
-        playerSeat.setTextContent(String.valueOf(seat));
-        root.appendChild(playerSeat);
-        
-        postToServer ("holecards", getStringFromDocument (document));
+
+    public static Document newDocument() {
+        try {
+            DocumentBuilder builder;
+            builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            return builder.newDocument();
+        } catch(ParserConfigurationException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
-
-    public Action getAction () {
-        return new Action (Action.FOLD, 0, 0);
-    }
-
-
-    public Preferences getPreferences () {
-        return prefs;
-    }
-
-
-    public void init (Preferences playerPrefs) {
-        this.prefs = playerPrefs;
-    }
-
-
-    public void actionEvent (int pos, Action act) {
-
-    }
-
-    public void dealHoleCardsEvent () {}
-
-    public void gameOverEvent () {}
-
-    public void gameStartEvent (GameInfo gameInfo) {
-    	this.gameInfo = gameInfo;
-    }
-
-    public void gameStateChanged () {}
-
-    public void showdownEvent (int seat, Card c1, Card c2) {}
-
-    public void stageEvent (int stage) {}
-
-    public void winEvent (int pos, double amount, String handName) {}
 
 }
