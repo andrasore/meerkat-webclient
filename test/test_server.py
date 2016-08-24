@@ -3,48 +3,56 @@ from flask import request
 
 app = Flask (__name__)
 
-@app.route ("/")
+@app.route ('/')
 def index ():
-    return "MeerkatWebClient test webservice"
+    return 'MeerkatWebClient test webservice'
 
 
-@app.route ("/holecards", methods=["GET", "POST"])
+@app.route ('/holecards', methods=['POST'])
 def hole_cards ():
-    if request.method == 'POST':
-        print (request.data)
-        return request.data
-    else:
-        return "HoleCards"
+    print(request.data)
+    print(request.mimetype)
+    return 'HoleCards'
 
 
-@app.route ("/getaction")
+@app.route ('/getaction', methods=['GET'])
 def getaction ():
-    return "Action"
+    return '<?xml version="1.0" encoding="UTF-8"?><action>FOLD</action>'
 
 
-@app.route ("/action")
+@app.route ('/action', methods=['POST'])
 def action_event ():
-    return "ActionEvent"
+    print(request.data)
+    print(request.mimetype)
+    return 'ActionEvent'
 
 
-@app.route ("/gamestate")
+@app.route ('/gamestate', methods=['POST'])
 def gamestate ():
-    return "GameState"
+    print(request.data)
+    print(request.mimetype)
+    return 'GameState'
 
 
-@app.route ("/showdown")
+@app.route ('/showdown', methods=['POST'])
 def showdown_event ():
-    return "ShowdownEvent"
+    print(request.data)
+    print(request.mimetype)
+    return 'ShowdownEvent'
 
 
-@app.route ("/stage")
+@app.route ('/stage', methods=['POST'])
 def stage_event ():
-    return "StageEvent"
+    print(request.data)
+    print(request.mimetype)
+    return 'StageEvent'
 
 
-@app.route ("/win")
+@app.route ('/win', methods=['POST'])
 def win_event ():
-    return "WinEvent"
+    print(request.data)
+    print(request.mimetype)
+    return 'WinEvent'
 
 
 app.run ()

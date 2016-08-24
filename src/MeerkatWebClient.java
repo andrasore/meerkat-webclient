@@ -1,6 +1,9 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -9,6 +12,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.xml.parsers.DocumentBuilder;
@@ -23,6 +27,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
 import com.biotools.meerkat.Action;
 import com.biotools.meerkat.Card;
@@ -71,7 +76,7 @@ public class MeerkatWebClient implements com.biotools.meerkat.Player {
         cards.appendChild(card1);
 
         Element card2 = document.createElement("card");
-        card1.setTextContent(c2.toString());
+        card2.setTextContent(c2.toString());
         cards.appendChild(card2);
 
         Element playerSeat = document.createElement("seat");
@@ -83,7 +88,17 @@ public class MeerkatWebClient implements com.biotools.meerkat.Player {
 
 
     public Action getAction() {
-        return new Action(Action.FOLD, 0, 0);
+    	String actionString = getActionStringFromServer(serverAddress + "getaction");
+    	
+    	if(actionString.equals("FOLD")) {
+    		 return new Action(Action.FOLD, 0, 0);
+    	} else if(actionString.equals("CHECK")) {
+    		 return new Action(Action.CHECK, 0, 0);
+    	} else if(actionString.equals("RAISE")) {
+    		 return new Action(Action.RAISE, 0, 0);
+    	}
+    	
+    	return new Action(Action.FOLD, 0, 0);
     }
 
 
@@ -127,6 +142,7 @@ public class MeerkatWebClient implements com.biotools.meerkat.Player {
             serverUrl = new URL(url);
             connection = (HttpURLConnection) serverUrl.openConnection();
             connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "text/xml");
             connection.setDoOutput(true);
             
             OutputStream stream = connection.getOutputStream();
@@ -136,10 +152,29 @@ public class MeerkatWebClient implements com.biotools.meerkat.Player {
             
             connection.getResponseCode();
         } catch(MalformedURLException e) {
+            JOptionPane.showMessageDialog(null, "URL is invalid!");
             e.printStackTrace();
         } catch(IOException e) {
             e.printStackTrace();
         }
+    }
+
+
+    public static String getActionStringFromServer(String url) {
+    	String actionString = "FOLD";
+    	try {
+			Document document = DocumentBuilderFactory.newInstance()
+					.newDocumentBuilder()
+					.parse(url);
+			actionString = document.getDocumentElement().getTextContent();
+		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		}
+        return actionString;
     }
 
 
