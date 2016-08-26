@@ -1,5 +1,6 @@
 from flask import Flask
 from flask import request
+from flask import Response
 
 app = Flask (__name__)
 
@@ -15,9 +16,12 @@ def hole_cards ():
     return 'HoleCards'
 
 
+#amount element is necessary only for raise
 @app.route ('/getaction', methods=['GET'])
 def getaction ():
-    return '<?xml version="1.0" encoding="UTF-8"?><action>FOLD</action>'
+    xml = '<?xml version="1.0" encoding="UTF-8"?>\
+        <action><type>fold</type><amount>0</amount></action>'
+    return Response(xml, mimetype='text/xml');
 
 
 @app.route ('/action', methods=['POST'])
