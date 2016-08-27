@@ -11,7 +11,7 @@ public class MeerkatWebServerConnectionTest {
 	public void setUp() {
 	    server = new MeerkatWebServerConnection ("http://localhost:5000/");
 	}
-
+	
 	@Test
 	public void testSendHoleCards() {
 		server.sendHoleCards("AB", "CD", 1);

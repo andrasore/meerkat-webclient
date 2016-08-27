@@ -5,6 +5,7 @@ import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 
 import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
@@ -25,9 +26,24 @@ import org.xml.sax.SAXException;
 public class MeerkatWebServerConnection {
 
     private String serverAddress;
-    
+
     private String cachedActionType; //these are read once before set to null
     private String cachedRaiseAmount;
+    
+    public static class Player {
+    	
+    	
+    	public String name;
+    	public double stack;
+    	public int    seat;
+    	
+    	
+    	public Player (String name, double stack, int seat) {
+    		this.name = name;
+    		this.stack = stack;
+    		this.seat = seat;
+    	}
+    }
 
 
     public MeerkatWebServerConnection (String serverAddress) {
@@ -62,6 +78,33 @@ public class MeerkatWebServerConnection {
         }
     }
 
+    
+    public void sendPlayerInfo (List<Player> players) {
+    	Document document = newDocument();
+
+        Element root = document.createElement("players");
+        document.appendChild(root);
+
+        for (Player p : players) {
+        	Element player = document.createElement("player");
+            root.appendChild(player);
+            
+            Element name = document.createElement("name");
+            name.setTextContent(String.valueOf(p.name));
+            player.appendChild(name);
+            
+            Element stack = document.createElement("stack");
+            stack.setTextContent(String.valueOf(p.stack));
+            player.appendChild(stack);
+            
+            Element seat = document.createElement("seat");
+            seat.setTextContent(String.valueOf(p.seat));
+            player.appendChild(seat);
+        }
+
+        postToServer("holecards", getStringFromDocument(document));
+    }
+    
 
     public void sendHoleCards(String c1, String c2, int seat) {
         Document document = newDocument();
@@ -84,7 +127,31 @@ public class MeerkatWebServerConnection {
         playerSeat.setTextContent(String.valueOf(seat));
         root.appendChild(playerSeat);
 
-        postToServer(serverAddress + "holecards", getStringFromDocument(document));
+        postToServer("holecards", getStringFromDocument(document));
+    }
+
+
+    public void sendActionEvent (int seat, String action, double amount) {
+        Document document = newDocument();
+
+        Element root = document.createElement("action");
+        document.appendChild(root);
+
+        Element playerSeat = document.createElement("seat");
+        playerSeat.setTextContent(String.valueOf(seat));
+        root.appendChild(playerSeat);
+        
+        Element actionType = document.createElement("type");
+        actionType.setTextContent(action);
+        root.appendChild(actionType);
+        
+        if (amount > 0) {
+		    Element raiseAmount = document.createElement("amount");
+		    raiseAmount.setTextContent(String.valueOf(amount));
+		    root.appendChild(raiseAmount);
+        }
+
+        postToServer("action", getStringFromDocument(document));
     }
 
 
@@ -92,7 +159,7 @@ public class MeerkatWebServerConnection {
         try {
             Document document = DocumentBuilderFactory.newInstance()
                 .newDocumentBuilder()
-                .parse(serverAddress + "getaction");
+                .parse(serverAddress + "action");
 
             cachedActionType = document.getDocumentElement()
                 .getElementsByTagName("type")
@@ -111,9 +178,9 @@ public class MeerkatWebServerConnection {
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
 
@@ -146,10 +213,8 @@ public class MeerkatWebServerConnection {
         Transformer transformer;
 
         try {
-
             transformer = tf.newTransformer();
             transformer.transform(domSource, result);
-
         } catch(TransformerConfigurationException e) {
             e.printStackTrace();
         } catch(TransformerException e) {

@@ -1,5 +1,6 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -8,6 +9,7 @@ import javax.swing.JTextField;
 import com.biotools.meerkat.Action;
 import com.biotools.meerkat.Card;
 import com.biotools.meerkat.GameInfo;
+import com.biotools.meerkat.PlayerInfo;
 import com.biotools.meerkat.util.Preferences;
 
 
@@ -15,7 +17,7 @@ public class MeerkatWebClient implements com.biotools.meerkat.Player {
     private GameInfo gameInfo;
     private Preferences prefs;
     private MeerkatWebServerConnection server;
-    
+
     private int seat;
 
 
@@ -47,18 +49,6 @@ public class MeerkatWebClient implements com.biotools.meerkat.Player {
     }
 
 
-    public static  int actionStringToInt (String actionString) {
-        if(actionString.equals("fold")) {
-         return Action.FOLD;
-        } else if(actionString.equals("check")) {
-         return Action.CHECK;
-        } else if(actionString.equals("raise")) {
-         return Action.RAISE;
-        }
-        return Action.INVALID;
-    }
-
-
     public void holeCards(Card c1, Card c2, int seat) {
         server.sendHoleCards(c1.toString(), c2.toString(), seat);
         this.seat = seat;
@@ -66,7 +56,7 @@ public class MeerkatWebClient implements com.biotools.meerkat.Player {
 
 
     public Action getAction() {
-        int action = actionStringToInt(server.getActionTypeString());
+        int action = ActionConverter.stringToInt(server.getActionTypeString());
         int raiseAmount = 0;
 
         if(action == Action.RAISE) {
@@ -77,25 +67,68 @@ public class MeerkatWebClient implements com.biotools.meerkat.Player {
     }
 
 
-    public void actionEvent(int pos, Action act) {
-
+    public void actionEvent(int pos, Action action) {
+        double amount = 0;
+        int index = action.getActionIndex(); //this will only leave fold/call/raise events,
+                                             //and convert everything else to invalid
+        if (index != Action.INVALID) {
+        	
+        	if (index == Action.RAISE) {
+                amount = action.getAmount();
+            }
+        	
+        	String actionString = ActionConverter.intToString(index);
+        	server.sendActionEvent (pos, actionString, amount);
+        }
     }
 
 
     public void gameOverEvent() {
+
     }
 
     public void gameStartEvent(GameInfo gameInfo) {
         this.gameInfo = gameInfo;
+        ArrayList<MeerkatWebServerConnection.Player> players 
+        	= new ArrayList<MeerkatWebServerConnection.Player>();
+
+        for(int i = 0; i < 10; i++) {
+        	if (!gameInfo.inGame(i)) {
+        		continue;
+        	}
+        	
+        	PlayerInfo player  = gameInfo.getPlayer(i);
+        	
+        	String playerName  = player.getName(); 
+        	double playerStack = player.getBankRollAtStartOfHand();
+        	
+            players.add(new MeerkatWebServerConnection.Player(playerName, playerStack, i));
+        }
+        
+        server.sendPlayerInfo(players);
     }
 
-    public void gameStateChanged() {}
+    public void gameStateChanged() {
 
-    public void showdownEvent(int seat, Card c1, Card c2) {}
+    }
 
-    public void stageEvent(int stage) {}
+    public void showdownEvent(int seat, Card c1, Card c2) {
 
-    public void winEvent(int pos, double amount, String handName) {}
+    }
+
+    public void stageEvent(int stage) {
+
+    }
+
+
+    public void winEvent(int pos, double amount, String handName) {
+
+    }
+
+
+    public void dealHoleCardsEvent() {
+
+    }
 
 
 }
