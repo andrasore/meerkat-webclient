@@ -9,6 +9,7 @@ import javax.swing.JTextField;
 import com.biotools.meerkat.Action;
 import com.biotools.meerkat.Card;
 import com.biotools.meerkat.GameInfo;
+import com.biotools.meerkat.Hand;
 import com.biotools.meerkat.PlayerInfo;
 import com.biotools.meerkat.util.Preferences;
 
@@ -68,17 +69,12 @@ public class MeerkatWebClient implements com.biotools.meerkat.Player {
 
 
     public void actionEvent(int pos, Action action) {
-        double amount = 0;
-        int index = action.getActionIndex(); //this will only leave fold/call/raise events,
-                                             //and convert everything else to invalid
-        if (index != Action.INVALID) {
-        	
-        	if (index == Action.RAISE) {
-                amount = action.getAmount();
-            }
-        	
-        	String actionString = ActionConverter.intToString(index);
-        	server.sendActionEvent (pos, actionString, amount);
+        double amount = action.getAmount();
+
+        String actionString = ActionConverter.toString(action);
+
+        if (!actionString.equals("invalid")) {
+            server.sendActionEvent (pos, actionString, amount);
         }
     }
 
@@ -87,37 +83,47 @@ public class MeerkatWebClient implements com.biotools.meerkat.Player {
 
     }
 
+
     public void gameStartEvent(GameInfo gameInfo) {
         this.gameInfo = gameInfo;
-        ArrayList<MeerkatWebServerConnection.Player> players 
-        	= new ArrayList<MeerkatWebServerConnection.Player>();
+        ArrayList<MeerkatWebServerConnection.Player> players
+            = new ArrayList<MeerkatWebServerConnection.Player>();
 
         for(int i = 0; i < 10; i++) {
-        	if (!gameInfo.inGame(i)) {
-        		continue;
-        	}
-        	
-        	PlayerInfo player  = gameInfo.getPlayer(i);
-        	
-        	String playerName  = player.getName(); 
-        	double playerStack = player.getBankRollAtStartOfHand();
-        	
+
+            if(!gameInfo.inGame(i)) {
+                continue;
+            }
+
+            PlayerInfo player  = gameInfo.getPlayer(i);
+
+            String playerName  = player.getName();
+            double playerStack = player.getBankRollAtStartOfHand();
+
             players.add(new MeerkatWebServerConnection.Player(playerName, playerStack, i));
         }
-        
+
         server.sendPlayerInfo(players);
     }
 
-    public void gameStateChanged() {
-
-    }
 
     public void showdownEvent(int seat, Card c1, Card c2) {
-
+        server.sendShowdownEvent (c1.toString(), c2.toString(), seat);
     }
 
-    public void stageEvent(int stage) {
 
+    public void stageEvent(int stage) {
+        Hand board = gameInfo.getBoard();
+
+        if (board.size () > 0) {
+            ArrayList<String> boardCards = new ArrayList<String>();
+        
+            for(int i = 0; i < board.size(); i++) {
+                boardCards.add(board.getCard(i).toString());
+            }
+            
+            server.sendBoardCards(boardCards);
+        }
     }
 
 
@@ -131,4 +137,7 @@ public class MeerkatWebClient implements com.biotools.meerkat.Player {
     }
 
 
+    public void gameStateChanged() {
+
+    }
 }

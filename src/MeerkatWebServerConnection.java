@@ -5,6 +5,7 @@ import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JOptionPane;
@@ -29,20 +30,20 @@ public class MeerkatWebServerConnection {
 
     private String cachedActionType; //these are read once before set to null
     private String cachedRaiseAmount;
-    
+
     public static class Player {
-    	
-    	
-    	public String name;
-    	public double stack;
-    	public int    seat;
-    	
-    	
-    	public Player (String name, double stack, int seat) {
-    		this.name = name;
-    		this.stack = stack;
-    		this.seat = seat;
-    	}
+
+
+        public String name;
+        public double stack;
+        public int    seat;
+
+
+        public Player (String name, double stack, int seat) {
+            this.name = name;
+            this.stack = stack;
+            this.seat = seat;
+        }
     }
 
 
@@ -61,7 +62,7 @@ public class MeerkatWebServerConnection {
             serverUrl = new URL(serverAddress + urlPostfix);
             connection = (HttpURLConnection) serverUrl.openConnection();
             connection.setRequestMethod("POST");
-            connection.setRequestProperty("Content-Type", "text/xml");
+            connection.setRequestProperty("Content-Type", "text/xml; charset=utf-8");
             connection.setDoOutput(true);
 
             OutputStream stream = connection.getOutputStream();
@@ -78,80 +79,105 @@ public class MeerkatWebServerConnection {
         }
     }
 
-    
-    public void sendPlayerInfo (List<Player> players) {
-    	Document document = newDocument();
 
-        Element root = document.createElement("players");
-        document.appendChild(root);
+    public void sendPlayerInfo (List<Player> players) {
+        Document document = newDocument();
+
+        Element rootElem = document.createElement("players");
+        document.appendChild(rootElem);
 
         for (Player p : players) {
-        	Element player = document.createElement("player");
-            root.appendChild(player);
-            
-            Element name = document.createElement("name");
-            name.setTextContent(String.valueOf(p.name));
-            player.appendChild(name);
-            
-            Element stack = document.createElement("stack");
-            stack.setTextContent(String.valueOf(p.stack));
-            player.appendChild(stack);
-            
-            Element seat = document.createElement("seat");
-            seat.setTextContent(String.valueOf(p.seat));
-            player.appendChild(seat);
+            Element playerElem = document.createElement("player");
+            rootElem.appendChild(playerElem);
+
+            Element nameElem = document.createElement("name");
+            nameElem.setTextContent(String.valueOf(p.name));
+            playerElem.appendChild(nameElem);
+
+            Element stackElem = document.createElement("stack");
+            stackElem.setTextContent(String.valueOf(p.stack));
+            playerElem.appendChild(stackElem);
+
+            Element seatElem = document.createElement("seat");
+            seatElem.setTextContent(String.valueOf(p.seat));
+            playerElem.appendChild(seatElem);
         }
 
         postToServer("holecards", getStringFromDocument(document));
     }
+
+    private void sendCards (String c1, String c2, int seat, String identifier) {
+    	Document document = newDocument();
+
+        Element rootElem = document.createElement(identifier);
+        document.appendChild(rootElem);
+
+        Element cardsElem = document.createElement("cards");
+        rootElem.appendChild(cardsElem);
+
+        Element card1Elem = document.createElement("card");
+        card1Elem.setTextContent(c1);
+        cardsElem.appendChild(card1Elem);
+
+        Element card2elem = document.createElement("card");
+        card2elem.setTextContent(c2);
+        cardsElem.appendChild(card2elem);
+
+        Element seatElem = document.createElement("seat");
+        seatElem.setTextContent(String.valueOf(seat));
+        rootElem.appendChild(seatElem);
+
+        postToServer(identifier, getStringFromDocument(document));
+    }
     
 
-    public void sendHoleCards(String c1, String c2, int seat) {
-        Document document = newDocument();
-
-        Element root = document.createElement("holecards");
-        document.appendChild(root);
-
-        Element cards = document.createElement("cards");
-        root.appendChild(cards);
-
-        Element card1 = document.createElement("card");
-        card1.setTextContent(c1);
-        cards.appendChild(card1);
-
-        Element card2 = document.createElement("card");
-        card2.setTextContent(c2);
-        cards.appendChild(card2);
-
-        Element playerSeat = document.createElement("seat");
-        playerSeat.setTextContent(String.valueOf(seat));
-        root.appendChild(playerSeat);
-
-        postToServer("holecards", getStringFromDocument(document));
+    public void sendHoleCards(String card1, String card2, int seat) {
+        sendCards (card1, card2, seat, "holecards");
+    }
+    
+    
+    public void sendShowdownEvent (String card1, String card2, int seat) {
+        sendCards (card1, card2, seat, "showdown");
     }
 
 
     public void sendActionEvent (int seat, String action, double amount) {
         Document document = newDocument();
 
-        Element root = document.createElement("action");
-        document.appendChild(root);
+        Element rootElem = document.createElement("action");
+        document.appendChild(rootElem);
 
-        Element playerSeat = document.createElement("seat");
-        playerSeat.setTextContent(String.valueOf(seat));
-        root.appendChild(playerSeat);
-        
-        Element actionType = document.createElement("type");
-        actionType.setTextContent(action);
-        root.appendChild(actionType);
-        
+        Element seatElem = document.createElement("seat");
+        seatElem.setTextContent(String.valueOf(seat));
+        rootElem.appendChild(seatElem);
+
+        Element actionElem = document.createElement("type");
+        actionElem.setTextContent(action);
+        rootElem.appendChild(actionElem);
+
         if (amount > 0) {
-		    Element raiseAmount = document.createElement("amount");
-		    raiseAmount.setTextContent(String.valueOf(amount));
-		    root.appendChild(raiseAmount);
+            Element raiseElem = document.createElement("amount");
+            raiseElem.setTextContent(String.valueOf(amount));
+            rootElem.appendChild(raiseElem);
         }
 
         postToServer("action", getStringFromDocument(document));
+    }
+
+
+    public void sendBoardCards(ArrayList<String> boardCards) {
+        Document document = newDocument();
+
+        Element rootElem = document.createElement("board");
+        document.appendChild(rootElem);
+
+        for (String c : boardCards) {
+            Element cardElem = document.createElement("card");
+            cardElem.setTextContent(c);
+            rootElem.appendChild(cardElem);
+        }
+
+        postToServer("board", getStringFromDocument(document));
     }
 
 

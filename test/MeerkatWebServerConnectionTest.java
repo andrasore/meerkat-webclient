@@ -1,5 +1,6 @@
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -25,5 +26,25 @@ public class MeerkatWebServerConnectionTest {
 	@Test
 	public void testGetRaiseAmountString() {
 		assertEquals("0", server.getRaiseAmountString());
+	}
+	
+	@Test
+	public void testSendActionEvent() {
+		server.sendActionEvent(3, "Test", 3.0);
+	}
+	
+	@Test
+	public void testSendShowdownEvent() {
+		server.sendShowdownEvent("AB", "CD", 1);
+	}
+	
+	@Test
+	public void testSendBoardCards() {
+		ArrayList<String> cards = new ArrayList<String>();
+		cards.add("AB");
+		cards.add("CD");
+		cards.add("EF");
+		
+		server.sendBoardCards(cards);
 	}
 }

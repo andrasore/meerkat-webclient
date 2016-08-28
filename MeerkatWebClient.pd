@@ -1,14 +1,13 @@
-# All plug-ins must run through the following class:
 PLAYER_CLASS=PlugInOpponent
 
-# put your bot's full class name here:
 BOT_PLAYER_CLASS=MeerkatWebClient
 
-# put the path to your jar file here (relative to application root)
+# path for the .jar file (relative to PokerAcademy 2)
 PLAYER_JAR_FILE=data/bots/MeerkatWebClient.jar
 
-# Your Bot's name:
 PLAYER_NAME=MeerkatWebClient
 
-# Your bot engine name:
 AI_NAME=MeerkatWebClient
+
+# Uncomment this if you implement a no-limit bot
+# NO_LIMIT=true

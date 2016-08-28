@@ -1,4 +1,4 @@
-# This is an example server. It can be also used to test the client bot.
+# This is an example server. It is also used to test the client bot.
 
 from flask import Flask
 from flask import request
@@ -27,7 +27,7 @@ def action():
     else:
         print(request.data)
         print(request.mimetype)
-        return 'ActionEvent'
+        return 'Action'
 
 
 @app.route('/gamestate', methods=['POST'])
@@ -41,21 +41,21 @@ def gamestate():
 def showdown_event():
     print(request.data)
     print(request.mimetype)
-    return 'ShowdownEvent'
+    return 'Showdown'
 
 
-@app.route('/stage', methods=['POST'])
+@app.route('/board', methods=['POST'])
 def stage_event():
     print(request.data)
     print(request.mimetype)
-    return 'StageEvent'
+    return 'Board'
 
 
-@app.route('/win', methods=['POST'])
-def win_event():
-    print(request.data)
-    print(request.mimetype)
-    return 'WinEvent'
+#@app.route('/win', methods=['POST'])
+#def win_event():
+    #print(request.data)
+    #print(request.mimetype)
+    #return 'Win'
 
 
 app.run()
