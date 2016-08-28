@@ -34,40 +34,45 @@ Sending is performed with POST requests.
 
 #### Required URLs:
 
-* <server path>/holecards: The player's seat and hole cards are sent here using
+* `<server path>/holecards`: The player's seat and hole cards are sent here using
 a POST request
 
-* <server path>/action: Actions made at the table are sent here, and a GET request
+* `<server path>/action`: Actions made at the table are sent here, and a GET request
 should return the bot's next action
 
-* <server path>/gamestate: Initial state is sent here, including player names,
+* `<server path>/gamestate`: Initial state is sent here, including player names,
 seats, and stack sizes
 
-* <server path>/showdown: Used when a player is showing their cards
+* `<server path>/showdown`: Used when a player is showing their cards
 
-* <server path>/board: Board cards are sent here
+* `<server path>/board`: Board cards are sent here
 
 #### Sent data
 
 Data is sent in XML. Example data:
 
 Hole cards:
-    <holecards>
-        <cards>
-            <card>4s</card>
-            <card>3h</card>
-        </cards>
-        <seat>4</seat>
-    </holecards>
+```
+<holecards>
+    <cards>
+        <card>4s</card>
+        <card>3h</card>
+    </cards>
+    <seat>4</seat>
+</holecards>
+```
 
 Action:
+```
     <action>
         <seat>8</seat>
         <type>bet</type>
         <amount>2.0</amount>
     </action>
+```
 
 Game state:
+```
     <players>
         <player>
             <name>Crusoe</name>
@@ -90,8 +95,10 @@ Game state:
             <seat>5</seat>
         </player>
     </players>
+```
 
 Showdown:
+```
     <showdown>
         <cards>
             <card>4s</card>
@@ -99,14 +106,17 @@ Showdown:
         </cards>
         <seat>4</seat>
     </showdown>
+```
 
 Board :
+```
     <board>
         <card>7s</card>
         <card>4h</card>
         <card>2d</card>
         <card>Qd</card>
     </board>
+```
 
 ### Implementation
 
