@@ -34,19 +34,19 @@ Sending is performed with POST requests.
 
 #### Required URLs:
 
-* <server path>/holecards: The player's seat and hole cards are sent here
+* `<server path>/holecards`: The player's seat and hole cards are sent here
 
-* <server path>/action: Actions made at the table are sent here, and a GET
+* `<server path>/action`: Actions made at the table are sent here, and a GET
   request should return the bot's next action
 
-* <server path>/newgame: Initial state is sent here, including player names,
+* `<server path>/newgame`: Initial state is sent here, including player names,
   seats, and stack sizes, plus button position
 
-* <server path>/board: Board cards are sent here
+* `<server path>/board`: Board cards are sent here
 
-* <server path>/showdown: Shown player cards are sent here with seat number.
+* `<server path>/showdown`: Shown player cards are sent here with seat number.
 
-* <server path>/gameover: Winning players with won amounts are sent here. More
+* `<server path>/gameover`: Winning players with won amounts are sent here. More
   winners exist when split pot, side pot etc.
 
 #### Sent data
@@ -54,22 +54,27 @@ Sending is performed with POST requests.
 Data is sent in XML. Example data:
 
 Hole cards:
-    <holecards>
-        <cards>
-            <card>4s</card>
-            <card>3h</card>
-        </cards>
-        <seat>4</seat>
-    </holecards>
+```
+<holecards>
+    <cards>
+        <card>4s</card>
+        <card>3h</card>
+    </cards>
+    <seat>4</seat>
+</holecards>
+```
 
 Action:
+```
     <action>
         <seat>8</seat>
         <type>bet</type>
         <amount>2.0</amount>
     </action>
+```
 
 New game:
+```
     <newgame>
         <players>
             <player>
@@ -85,25 +90,36 @@ New game:
         </players>
         <buttonseat>2</buttonseat>
     </newgame>
+```
 
 Showdown:
+```
     <showdown>
         <cards>
             <card>4s</card>
             <card>3h</card>
+            <seat>4</seat>
         </cards>
-        <seat>4</seat>
+        <cards>
+            <card>9c</card>
+            <card>As</card>
+            <seat>3</seat>
+        </cards>
     </showdown>
+```
 
 Board :
+```
     <board>
         <card>7s</card>
         <card>4h</card>
         <card>2d</card>
         <card>Qd</card>
     </board>
+```
 
 Game over:
+```
     <gameover>
         <winning>
             <seat>3</seat>
@@ -114,6 +130,7 @@ Game over:
             <amount>2.0</amount>
         </winning>
     </gameover>
+```
 
 ### Implementation
 
