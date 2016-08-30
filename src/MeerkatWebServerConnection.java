@@ -31,13 +31,13 @@ public class MeerkatWebServerConnection {
     private String cachedActionType; //these are read once before set to null
     private String cachedRaiseAmount;
 
+    private ArrayList<PlayerCards> shownCards;
+    private ArrayList<Winning>     playersWon; //these are sent all at once
+
     public static class Player {
-
-
         public String name;
         public double stack;
         public int    seat;
-
 
         public Player (String name, double stack, int seat) {
             this.name = name;
@@ -46,11 +46,36 @@ public class MeerkatWebServerConnection {
         }
     }
 
+    private class PlayerCards {
+        public String card1;
+        public String card2;
+        public int seat;
+
+        public PlayerCards(String card1, String card2, int seat) {
+            this.card1 = card1;
+            this.card2 = card2;
+            this.seat = seat;
+        }
+    }
+
+    private class Winning {
+        public int seat;
+        public double amount;
+
+        public Winning(int seat, double amount) {
+            this.seat = seat;
+            this.amount = amount;
+        }
+    }
+
 
     public MeerkatWebServerConnection (String serverAddress) {
         this.serverAddress = serverAddress;
         cachedActionType   = null;
         cachedRaiseAmount  = null;
+        
+        shownCards = new ArrayList<PlayerCards> ();
+        playersWon = new ArrayList<Winning> ();
     }
 
 
@@ -80,15 +105,22 @@ public class MeerkatWebServerConnection {
     }
 
 
-    public void sendPlayerInfo (List<Player> players) {
+    public void sendNewGame (List<Player> players, int buttonSeat) {
         Document document = newDocument();
 
-        Element rootElem = document.createElement("players");
+        Element rootElem = document.createElement("newgame");
         document.appendChild(rootElem);
+
+        Element buttonSeatElem = document.createElement("buttonseat");
+        buttonSeatElem.setTextContent(String.valueOf(buttonSeat));
+        rootElem.appendChild(buttonSeatElem);
+
+        Element playersElem = document.createElement("players");
+        rootElem.appendChild(playersElem);
 
         for (Player p : players) {
             Element playerElem = document.createElement("player");
-            rootElem.appendChild(playerElem);
+            playersElem.appendChild(playerElem);
 
             Element nameElem = document.createElement("name");
             nameElem.setTextContent(String.valueOf(p.name));
@@ -103,41 +135,33 @@ public class MeerkatWebServerConnection {
             playerElem.appendChild(seatElem);
         }
 
-        postToServer("holecards", getStringFromDocument(document));
+        postToServer("newgame", getStringFromDocument(document));
     }
 
-    private void sendCards (String c1, String c2, int seat, String identifier) {
-    	Document document = newDocument();
 
-        Element rootElem = document.createElement(identifier);
+
+    public void sendHoleCards(String card1, String card2, int seat) {
+        Document document = newDocument();
+
+        Element rootElem = document.createElement("holecards");
         document.appendChild(rootElem);
 
         Element cardsElem = document.createElement("cards");
         rootElem.appendChild(cardsElem);
 
         Element card1Elem = document.createElement("card");
-        card1Elem.setTextContent(c1);
+        card1Elem.setTextContent(card1);
         cardsElem.appendChild(card1Elem);
 
         Element card2elem = document.createElement("card");
-        card2elem.setTextContent(c2);
+        card2elem.setTextContent(card2);
         cardsElem.appendChild(card2elem);
 
         Element seatElem = document.createElement("seat");
         seatElem.setTextContent(String.valueOf(seat));
         rootElem.appendChild(seatElem);
 
-        postToServer(identifier, getStringFromDocument(document));
-    }
-    
-
-    public void sendHoleCards(String card1, String card2, int seat) {
-        sendCards (card1, card2, seat, "holecards");
-    }
-    
-    
-    public void sendShowdownEvent (String card1, String card2, int seat) {
-        sendCards (card1, card2, seat, "showdown");
+        postToServer("holecards", getStringFromDocument(document));
     }
 
 
@@ -162,6 +186,80 @@ public class MeerkatWebServerConnection {
         }
 
         postToServer("action", getStringFromDocument(document));
+    }
+    
+
+    private Document getGameoverDocument () {
+    	Document document = newDocument();
+
+        Element rootElem = document.createElement("gameover");
+        document.appendChild(rootElem);
+
+        for (Winning w : playersWon) {
+            Element winningElem = document.createElement("winning");
+            rootElem.appendChild(winningElem);
+
+            Element amountElem = document.createElement("amount");
+            amountElem.setTextContent(String.valueOf(w.amount));
+            winningElem.appendChild(amountElem);
+
+            Element seatElem = document.createElement("seat");
+            seatElem.setTextContent(String.valueOf(w.seat));
+            winningElem.appendChild(seatElem);
+        }
+        
+        return document;
+    }
+    
+    private Document getShowdownDocument () {
+    	Document document = newDocument();
+
+        Element rootElem = document.createElement("showdown");
+        document.appendChild(rootElem);
+
+        for (PlayerCards pc : shownCards) {
+            Element cardsElem = document.createElement("cards");
+            rootElem.appendChild(cardsElem);
+
+            Element card1Elem = document.createElement("card");
+            card1Elem.setTextContent(pc.card1);
+            cardsElem.appendChild(card1Elem);
+
+            Element card2elem = document.createElement("card");
+            card2elem.setTextContent(pc.card2);
+            cardsElem.appendChild(card2elem);
+
+            Element seatElem = document.createElement("seat");
+            seatElem.setTextContent(String.valueOf(pc.seat));
+            cardsElem.appendChild(seatElem);
+        }
+        
+        return document;
+    }
+    
+
+    public void sendGameOver () {        
+        if (!shownCards.isEmpty()) {
+            Document showdownDocument = getShowdownDocument ();
+            postToServer("showdown", getStringFromDocument(showdownDocument));
+            shownCards.clear();
+        }
+        
+        if (!playersWon.isEmpty()) {
+            Document gameoverDocument = getGameoverDocument ();
+            postToServer("gameover", getStringFromDocument(gameoverDocument));
+            playersWon.clear();
+        }
+    }
+
+
+    public void sendWinEvent(int pos, double amount) {
+        playersWon.add(new Winning (pos, amount));
+    }
+
+
+    public void sendShowdownEvent (String card1, String card2, int seat) {
+        shownCards.add(new PlayerCards(card1, card2, seat));
     }
 
 
@@ -260,5 +358,6 @@ public class MeerkatWebServerConnection {
         }
         return null;
     }
+
 
 }

@@ -34,18 +34,20 @@ Sending is performed with POST requests.
 
 #### Required URLs:
 
-* <server path>/holecards: The player's seat and hole cards are sent here using
-a POST request
+* <server path>/holecards: The player's seat and hole cards are sent here
 
-* <server path>/action: Actions made at the table are sent here, and a GET request
-should return the bot's next action
+* <server path>/action: Actions made at the table are sent here, and a GET
+  request should return the bot's next action
 
-* <server path>/gamestate: Initial state is sent here, including player names,
-seats, and stack sizes
-
-* <server path>/showdown: Used when a player is showing their cards
+* <server path>/newgame: Initial state is sent here, including player names,
+  seats, and stack sizes, plus button position
 
 * <server path>/board: Board cards are sent here
+
+* <server path>/showdown: Shown player cards are sent here with seat number.
+
+* <server path>/gameover: Winning players with won amounts are sent here. More
+  winners exist when split pot, side pot etc.
 
 #### Sent data
 
@@ -67,29 +69,22 @@ Action:
         <amount>2.0</amount>
     </action>
 
-Game state:
-    <players>
-        <player>
-            <name>Crusoe</name>
-            <stack>186.0</stack>
-            <seat>1</seat>
-        </player>
-        <player>
-            <name>Ogo Pogo</name>
-            <stack>199.0</stack>
-            <seat>2</seat>
-        </player>
-        <player>
-            <name>Hari</name>
-            <stack>212.5</stack>
-            <seat>3</seat>
-        </player>
-        <player>
-            <name>Hooke</name>
-            <stack>190.5</stack>
-            <seat>5</seat>
-        </player>
-    </players>
+New game:
+    <newgame>
+        <players>
+            <player>
+                <name>Crusoe</name>
+                <stack>186.0</stack>
+                <seat>1</seat>
+            </player>
+            <player>
+                <name>Ogo Pogo</name>
+                <stack>199.0</stack>
+                <seat>2</seat>
+            </player>
+        </players>
+        <buttonseat>2</buttonseat>
+    </newgame>
 
 Showdown:
     <showdown>
@@ -108,8 +103,25 @@ Board :
         <card>Qd</card>
     </board>
 
+Game over:
+    <gameover>
+        <winning>
+            <seat>3</seat>
+            <amount>2.0</amount>
+        </winning>
+        <winning>
+            <seat>4</seat>
+            <amount>2.0</amount>
+        </winning>
+    </gameover>
+
 ### Implementation
 
 Poker Academy 2.5 is packaged with Java JRE version 1.5, so some newer
 features (like JAXP) couldn't be used. The example server uses Python, plus
 Flask as a web framework.
+
+### Testing
+
+There is no fully automated test unfortunately, but you can run the JUnit tests
+while test_server.py is running. It will print outputs for the tested functions.

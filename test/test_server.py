@@ -14,7 +14,6 @@ def index():
 @app.route('/holecards', methods=['POST'])
 def hole_cards():
     print(request.data)
-    print(request.mimetype)
     return 'HoleCards'
 
 
@@ -26,36 +25,32 @@ def action():
         return Response(xml, mimetype='text/xml');
     else:
         print(request.data)
-        print(request.mimetype)
         return 'Action'
 
 
-@app.route('/gamestate', methods=['POST'])
-def gamestate():
+@app.route('/newgame', methods=['POST'])
+def newgame():
     print(request.data)
     print(request.mimetype)
-    return 'GameState'
+    return 'NewGame'
 
 
 @app.route('/showdown', methods=['POST'])
 def showdown_event():
     print(request.data)
-    print(request.mimetype)
     return 'Showdown'
 
 
 @app.route('/board', methods=['POST'])
 def stage_event():
     print(request.data)
-    print(request.mimetype)
     return 'Board'
 
 
-#@app.route('/win', methods=['POST'])
-#def win_event():
-    #print(request.data)
-    #print(request.mimetype)
-    #return 'Win'
+@app.route('/gameover', methods=['POST'])
+def win_event():
+    print(request.data)
+    return 'GameOver'
 
 
 app.run()

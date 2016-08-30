@@ -25,7 +25,7 @@ public class MeerkatWebServerConnectionTest {
 
 	@Test
 	public void testGetRaiseAmountString() {
-		assertEquals("0", server.getRaiseAmountString());
+		assertEquals("0", server.getRaiseAmountString()); //there is no way to test this nicely yet :c
 	}
 	
 	@Test

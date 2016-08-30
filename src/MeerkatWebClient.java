@@ -80,7 +80,7 @@ public class MeerkatWebClient implements com.biotools.meerkat.Player {
 
 
     public void gameOverEvent() {
-
+    	server.sendGameOver();
     }
 
 
@@ -103,7 +103,7 @@ public class MeerkatWebClient implements com.biotools.meerkat.Player {
             players.add(new MeerkatWebServerConnection.Player(playerName, playerStack, i));
         }
 
-        server.sendPlayerInfo(players);
+        server.sendNewGame(players, gameInfo.getButtonSeat());
     }
 
 
@@ -128,7 +128,7 @@ public class MeerkatWebClient implements com.biotools.meerkat.Player {
 
 
     public void winEvent(int pos, double amount, String handName) {
-
+    	server.sendWinEvent (pos, amount);
     }
 
 
