@@ -263,17 +263,24 @@ public class MeerkatWebServerConnection {
     }
 
 
-    public void sendBoardCards(ArrayList<String> boardCards) {
+    public void sendBoardCards(String stage, ArrayList<String> boardCards) {
         Document document = newDocument();
 
         Element rootElem = document.createElement("board");
         document.appendChild(rootElem);
 
+        Element cardsElem = document.createElement("cards");
+        rootElem.appendChild(cardsElem);
+
         for (String c : boardCards) {
             Element cardElem = document.createElement("card");
             cardElem.setTextContent(c);
-            rootElem.appendChild(cardElem);
+            cardsElem.appendChild(cardElem);
         }
+
+        Element stageElem = document.createElement("stage");
+        stageElem.setTextContent(stage);
+        rootElem.appendChild(stageElem);
 
         postToServer("board", getStringFromDocument(document));
     }

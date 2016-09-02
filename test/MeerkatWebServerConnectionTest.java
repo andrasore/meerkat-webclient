@@ -45,6 +45,6 @@ public class MeerkatWebServerConnectionTest {
 		cards.add("CD");
 		cards.add("EF");
 		
-		server.sendBoardCards(cards);
+		server.sendBoardCards("flop", cards);
 	}
 }

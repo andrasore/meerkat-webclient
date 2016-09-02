@@ -42,7 +42,7 @@ Sending is performed with POST requests.
 * `<server path>/newgame`: Initial state is sent here, including player names,
   seats, and stack sizes, plus button position
 
-* `<server path>/board`: Board cards are sent here
+* `<server path>/board`: Board cards, and current stage are sent here
 
 * `<server path>/showdown`: Shown player cards are sent here with seat number.
 
@@ -111,10 +111,13 @@ Showdown:
 Board :
 ```
     <board>
-        <card>7s</card>
-        <card>4h</card>
-        <card>2d</card>
-        <card>Qd</card>
+        <cards>
+            <card>7s</card>
+            <card>4h</card>
+            <card>2d</card>
+            <card>Qd</card>
+        </cards>
+        <stage>turn</stage>
     </board>
 ```
 

@@ -80,7 +80,7 @@ public class MeerkatWebClient implements com.biotools.meerkat.Player {
 
 
     public void gameOverEvent() {
-    	server.sendGameOver();
+        server.sendGameOver();
     }
 
 
@@ -112,23 +112,35 @@ public class MeerkatWebClient implements com.biotools.meerkat.Player {
     }
 
 
+    private String stageNumberToString (int stageNumber) {
+        switch (stageNumber) {
+            case 1: return "flop";
+            case 2: return "turn";
+            case 3: return "river";
+            default: return "invalid";
+        }
+    }
+
+
     public void stageEvent(int stage) {
         Hand board = gameInfo.getBoard();
 
         if (board.size () > 0) {
             ArrayList<String> boardCards = new ArrayList<String>();
-        
+
             for(int i = 0; i < board.size(); i++) {
                 boardCards.add(board.getCard(i).toString());
             }
-            
-            server.sendBoardCards(boardCards);
+
+            String stageString = stageNumberToString(stage);
+
+            server.sendBoardCards(stageString, boardCards);
         }
     }
 
 
     public void winEvent(int pos, double amount, String handName) {
-    	server.sendWinEvent (pos, amount);
+        server.sendWinEvent (pos, amount);
     }
 
 
