@@ -73,7 +73,7 @@ public class MeerkatWebServerConnection {
         this.serverAddress = serverAddress;
         cachedActionType   = null;
         cachedRaiseAmount  = null;
-        
+
         shownCards = new ArrayList<PlayerCards> ();
         playersWon = new ArrayList<Winning> ();
     }
@@ -187,10 +187,10 @@ public class MeerkatWebServerConnection {
 
         postToServer("action", getStringFromDocument(document));
     }
-    
+
 
     private Document getGameoverDocument () {
-    	Document document = newDocument();
+        Document document = newDocument();
 
         Element rootElem = document.createElement("gameover");
         document.appendChild(rootElem);
@@ -207,12 +207,12 @@ public class MeerkatWebServerConnection {
             seatElem.setTextContent(String.valueOf(w.seat));
             winningElem.appendChild(seatElem);
         }
-        
+
         return document;
     }
-    
+
     private Document getShowdownDocument () {
-    	Document document = newDocument();
+        Document document = newDocument();
 
         Element rootElem = document.createElement("showdown");
         document.appendChild(rootElem);
@@ -233,18 +233,18 @@ public class MeerkatWebServerConnection {
             seatElem.setTextContent(String.valueOf(pc.seat));
             cardsElem.appendChild(seatElem);
         }
-        
+
         return document;
     }
-    
 
-    public void sendGameOver () {        
+
+    public void sendGameOver () {
         if (!shownCards.isEmpty()) {
             Document showdownDocument = getShowdownDocument ();
             postToServer("showdown", getStringFromDocument(showdownDocument));
             shownCards.clear();
         }
-        
+
         if (!playersWon.isEmpty()) {
             Document gameoverDocument = getGameoverDocument ();
             postToServer("gameover", getStringFromDocument(gameoverDocument));

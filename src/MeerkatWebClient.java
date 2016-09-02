@@ -57,14 +57,19 @@ public class MeerkatWebClient implements com.biotools.meerkat.Player {
 
 
     public Action getAction() {
-        int action = ActionConverter.stringToInt(server.getActionTypeString());
-        int raiseAmount = 0;
+        String actionString = server.getActionTypeString();
+        double raiseAmount = gameInfo.getMinRaise ();
 
-        if(action == Action.RAISE) {
-            raiseAmount = Integer.parseInt(server.getRaiseAmountString());
+        if(actionString.equals ("raise") && !gameInfo.isFixedLimit()) {
+            double parsedAmount = Integer.parseInt(server.getRaiseAmountString());
+            if (parsedAmount > gameInfo.getMinRaise ()) {
+                raiseAmount = parsedAmount;
+            }
         }
 
-        return Action.getAction(action, gameInfo.getAmountToCall(seat), raiseAmount);
+        double toCall = gameInfo.getAmountToCall(seat);
+
+        return ActionConverter.stringToAction(actionString, toCall, raiseAmount);
     }
 
 
