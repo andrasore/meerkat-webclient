@@ -105,7 +105,7 @@ public class MeerkatWebServerConnection {
     }
 
 
-    public void sendNewGame (List<Player> players, int buttonSeat) {
+    public void sendNewGame (List<Player> players, int buttonSeat, double bigBlind) {
         Document document = newDocument();
 
         Element rootElem = document.createElement("newgame");
@@ -114,6 +114,10 @@ public class MeerkatWebServerConnection {
         Element buttonSeatElem = document.createElement("buttonseat");
         buttonSeatElem.setTextContent(String.valueOf(buttonSeat));
         rootElem.appendChild(buttonSeatElem);
+
+        Element bigBlindElem = document.createElement("bigBlind");
+        bigBlindElem.setTextContent(String.valueOf(bigBlind));
+        rootElem.appendChild(bigBlindElem);
 
         Element playersElem = document.createElement("players");
         rootElem.appendChild(playersElem);

@@ -40,7 +40,7 @@ Sending is performed with POST requests.
   request should return the bot's next action
 
 * `<server path>/newgame`: Initial state is sent here, including player names,
-  seats, and stack sizes, plus button position
+  seats, and stack sizes, button position, and big blind size.
 
 * `<server path>/board`: Board cards, and current stage are sent here
 
@@ -89,6 +89,7 @@ New game:
             </player>
         </players>
         <buttonseat>2</buttonseat>
+        <bigblind>1</bigblind>
     </newgame>
 ```
 

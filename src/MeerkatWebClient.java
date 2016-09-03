@@ -64,7 +64,7 @@ public class MeerkatWebClient implements com.biotools.meerkat.Player {
             double parsedAmount = Integer.parseInt(server.getRaiseAmountString());
             if (parsedAmount > gameInfo.getMinRaise ()) {
                 raiseAmount = parsedAmount;
-            }
+            }//PokerAcademy doesn't check whether raise amount is valid
         }
 
         double toCall = gameInfo.getAmountToCall(seat);
@@ -108,7 +108,9 @@ public class MeerkatWebClient implements com.biotools.meerkat.Player {
             players.add(new MeerkatWebServerConnection.Player(playerName, playerStack, i));
         }
 
-        server.sendNewGame(players, gameInfo.getButtonSeat());
+        double bigBlind = gameInfo.getBigBlindSize();
+
+        server.sendNewGame(players, gameInfo.getButtonSeat(), bigBlind);
     }
 
 
