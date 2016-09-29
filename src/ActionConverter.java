@@ -1,6 +1,30 @@
+import java.util.HashMap;
+
 import com.biotools.meerkat.Action;
 
 public class ActionConverter {
+
+    private final static HashMap<Integer, String> actionNames = new HashMap<Integer, String> () {
+        
+		private static final long serialVersionUID = -816882655436816817L;
+
+		{
+            put(Action.ALLIN_PASS,      "allinPass");
+            put(Action.BET,             "bet");
+            put(Action.BIG_BLIND,       "bigBlind");
+            put(Action.CALL,            "call");
+            put(Action.CHECK,           "check");
+            put(Action.FOLD,            "fold");
+            put(Action.INVALID,         "invalid");
+            put(Action.MUCK,            "muck");
+            put(Action.POST_ANTE,       "postAnte");
+            put(Action.POST_BLIND,      "postBlind");
+            put(Action.POST_DEAD_BLIND, "postDeadBlind");
+            put(Action.RAISE,           "raise");
+            put(Action.SIT_OUT,         "sitOut");
+            put(Action.SMALL_BLIND,     "smallBlind");
+        }
+    };
 
     public static Action stringToAction (String actionString, double toCall, double raiseAmount) {
         if(actionString.equals("fold")) {
@@ -15,18 +39,7 @@ public class ActionConverter {
 
 
     public static String toString (Action action) {
-        if (action.isBet()) {
-            return "bet";
-        } else if (action.isRaise()) {
-            return "raise";
-        } else if (action.isCall()) {
-            return "call";
-        } else if (action.isCheck()) {
-            return "check";
-        } else if (action.isFold()) {
-            return "fold";
-        } else {
-            return "invalid";
-        }
+        return actionNames.get(action.getType());
     }
+
 }
