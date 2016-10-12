@@ -1,9 +1,9 @@
 PLAYER_CLASS=PlugInOpponent
 
-BOT_PLAYER_CLASS=MeerkatWebClient
+BOT_PLAYER_CLASS=meerkatwebclient.MeerkatWebClient
 
 # path for the .jar file (relative to PokerAcademy 2)
-PLAYER_JAR_FILE=data/bots/MeerkatWebClient.jar
+PLAYER_JAR_FILE=data/bots/meerkat-webclient.jar
 
 PLAYER_NAME=MeerkatWebClient
 

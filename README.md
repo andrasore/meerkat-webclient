@@ -16,7 +16,7 @@ written as a web service, using your favourite tools.
 
 ### Bot usage
 
-As with all Poker Academy bots, you must copy the compiled .jar file, and the .pd file
+Build with gradle, then copy the compiled .jar file, and the .pd file
 into the /data/bots folder found in the game's directory.
 
 You must create a new player using this engine in the game menu.
@@ -141,8 +141,3 @@ Game over:
 Poker Academy 2.5 is packaged with Java JRE version 1.5, so some newer
 features (like JAXP) couldn't be used. The example server uses Python, plus
 Flask as a web framework.
-
-### Testing
-
-There is no fully automated test unfortunately, but you can run the JUnit tests
-while test_server.py is running. It will print outputs for the tested functions.
