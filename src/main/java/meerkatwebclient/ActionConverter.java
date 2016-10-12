@@ -1,3 +1,5 @@
+package meerkatwebclient;
+
 import java.util.HashMap;
 
 import com.biotools.meerkat.Action;

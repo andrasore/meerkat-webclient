@@ -1,0 +1,11 @@
+build
+.project
+.settings
+.classpath
+lib/.gradle
+settings.gradle
+src/gradle
+gradle
+gradlew*
+.gradle
+bin
