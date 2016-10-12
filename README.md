@@ -17,7 +17,12 @@ written as a web service, using your favourite tools.
 ### Bot usage
 
 Build with gradle, then copy the compiled .jar file, and the .pd file
-into the /data/bots folder found in the game's directory.
+into the /data/bots folder found in the game's directory:
+```
+./gradlew build
+cp build/libs/meerkat-webclient.jar  MeerkatWebClient.pd <PokerAcademy folder>/data/bots
+
+```
 
 You must create a new player using this engine in the game menu.
 
