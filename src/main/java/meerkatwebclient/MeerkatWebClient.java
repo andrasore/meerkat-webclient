@@ -130,15 +130,15 @@ public class MeerkatWebClient implements com.biotools.meerkat.Player {
         }
     }
 
-
+    
     public void stageEvent(int stage) {
         Hand board = gameInfo.getBoard();
 
         if (board.size () > 0) {
             ArrayList<String> boardCards = new ArrayList<String>();
 
-            for(int i = 0; i < board.size(); i++) {
-                boardCards.add(board.getCard(i).toString());
+            for(String card : board.toString().split(" ")) {
+                boardCards.add(card);
             }
 
             String stageString = stageNumberToString(stage);
