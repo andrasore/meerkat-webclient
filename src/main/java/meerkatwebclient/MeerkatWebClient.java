@@ -117,7 +117,7 @@ public class MeerkatWebClient implements com.biotools.meerkat.Player {
 
 
     public void showdownEvent(int seat, Card c1, Card c2) {
-        server.sendShowdownEvent (c1.toString(), c2.toString(), seat);
+        server.addShowdownEvent (c1.toString(), c2.toString(), seat);
     }
 
 
@@ -149,7 +149,7 @@ public class MeerkatWebClient implements com.biotools.meerkat.Player {
 
 
     public void winEvent(int pos, double amount, String handName) {
-        server.sendWinEvent (pos, amount);
+        server.addWinEvent (pos, amount);
     }
 
 

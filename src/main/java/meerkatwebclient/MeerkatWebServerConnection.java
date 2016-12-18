@@ -259,12 +259,12 @@ public class MeerkatWebServerConnection {
     }
 
 
-    public void sendWinEvent(int pos, double amount) {
+    public void addWinEvent(int pos, double amount) {
         playersWon.add(new Winning (pos, amount));
     }
 
 
-    public void sendShowdownEvent (String card1, String card2, int seat) {
+    public void addShowdownEvent (String card1, String card2, int seat) {
         shownCards.add(new PlayerCards(card1, card2, seat));
     }
 
